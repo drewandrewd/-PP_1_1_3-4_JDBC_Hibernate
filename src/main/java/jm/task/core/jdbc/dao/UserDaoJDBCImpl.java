@@ -9,12 +9,13 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
 
-
+    public static Connection connection = Util.getConnection();
 
     public UserDaoJDBCImpl() {
 
     }
 
+    @Override
     public void createUsersTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS users (
@@ -24,52 +25,74 @@ public class UserDaoJDBCImpl implements UserDao {
                     age TINYINT
                 );    
                 """;
-        try(Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
     }
 
+    @Override
     public void dropUsersTable() {
         String sql = """
                 DROP TABLE IF EXISTS users
                 """;
-        try(Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
     }
 
+    @Override
     public void saveUser(String name, String lastName, byte age) {
         String sql = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
-        try(Connection connection = Util.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, name);
-            statement.setString(2, lastName);
-            statement.setString(3, String.valueOf(age));
-            statement.executeUpdate();
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, name);
+                statement.setString(2, lastName);
+                statement.setString(3, String.valueOf(age));
+                statement.executeUpdate();
+                connection.commit();
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+                connection.rollback();
+            } finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
+
     }
 
+    @Override
     public void removeUserById(long id) {
         String sql = "DELETE FROM users WHERE id = ?";
-        try(Connection connection = Util.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, String.valueOf(id));
-            statement.executeUpdate();
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, String.valueOf(id));
+                statement.executeUpdate();
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                System.err.println(e.getMessage());
+            } finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
     }
 
+    @Override
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM users";
-        try(Connection connection = Util.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -84,14 +107,22 @@ public class UserDaoJDBCImpl implements UserDao {
         return list;
     }
 
+    @Override
     public void cleanUsersTable() {
         String sql = "TRUNCATE TABLE users";
-        try (Connection connection = Util.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
-            System.out.println("Таблица 'users' очищена.");
+        try {
+            connection.setAutoCommit(false);
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate(sql);
+                connection.commit();
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+                connection.rollback();
+            } finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
-            System.err.println("Ошибка при очистке таблицы: " + e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 }

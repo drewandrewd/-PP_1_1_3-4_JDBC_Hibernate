@@ -10,6 +10,9 @@ public class Util {
     public static final String USERNAME = "root";
     public static final String PASSWORD = "Da!00796da";
 
+    private Util() {
+    }
+
     public static Connection getConnection() {
         Connection connection = null;
         try {
@@ -18,6 +21,16 @@ public class Util {
             System.err.println(e.getMessage());
         }
         return connection;
+    }
+
+    public static void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
     }
 
 }
