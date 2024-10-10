@@ -21,6 +21,6 @@ public class Main {
         service.getAllUsers().stream().forEach(a -> System.out.println(a.toString()));
         service.cleanUsersTable();
         service.dropUsersTable();
-        Util.closeConnection(UserDaoJDBCImpl.connection);
+        Util.closeConnection();
     }
 }

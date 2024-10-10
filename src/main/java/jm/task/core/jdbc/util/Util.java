@@ -9,6 +9,7 @@ public class Util {
     public static final String URL = "jdbc:mysql://localhost:3306/new_schema";
     public static final String USERNAME = "root";
     public static final String PASSWORD = "Da!00796da";
+    public static final Connection CONNECTION = getConnection();
 
     private Util() {
     }
@@ -23,13 +24,11 @@ public class Util {
         return connection;
     }
 
-    public static void closeConnection(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println(e.getMessage());
-            }
+    public static void closeConnection() {
+        try {
+            CONNECTION.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
         }
     }
 
