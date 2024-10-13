@@ -113,7 +113,6 @@ public class UserDaoJDBCImpl implements UserDao {
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-
         }
     }
 }

@@ -1,47 +1,48 @@
 package jm.task.core.jdbc.service;
 
 import jm.task.core.jdbc.dao.UserDao;
-import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
+import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.model.User;
 
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
-    private UserDao userDaoJDBC = new UserDaoJDBCImpl();
+    private UserDao userDao = new UserDaoHibernateImpl();
 
     @Override
     public void createUsersTable() {
-        userDaoJDBC.createUsersTable();
+        userDao.createUsersTable();
     }
 
     @Override
     public void dropUsersTable() {
-        userDaoJDBC.dropUsersTable();
+        userDao.dropUsersTable();
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        userDaoJDBC.saveUser(name, lastName, age);
+        userDao.saveUser(name, lastName, age);
         System.out.println("Пользователь сохранен");
     }
 
     @Override
     public void removeUserById(long id) {
-        userDaoJDBC.removeUserById(id);
+        userDao.removeUserById(id);
         System.out.println("Пользователь удален");
     }
 
     @Override
     public List<User> getAllUsers() {
-        List<User> users = userDaoJDBC.getAllUsers();
+        List<User> users = userDao.getAllUsers();
         users.stream().forEach(a -> System.out.println(a.toString()));
+        System.out.println("Пользователи получены");
         return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        userDaoJDBC.cleanUsersTable();
+        userDao.cleanUsersTable();
         System.out.println("Таблица очищена");
     }
 }
