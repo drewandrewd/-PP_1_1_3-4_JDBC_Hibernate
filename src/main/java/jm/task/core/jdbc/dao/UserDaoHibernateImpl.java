@@ -3,12 +3,14 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
@@ -31,6 +33,8 @@ public class UserDaoHibernateImpl implements UserDao {
             Transaction transaction = session.beginTransaction();
             session.createSQLQuery(sql).executeUpdate();
             transaction.commit();
+        } catch (HibernateException e) {
+            System.err.println(e.getMessage());
         }
     }
 
@@ -41,6 +45,8 @@ public class UserDaoHibernateImpl implements UserDao {
             Transaction transaction = session.beginTransaction();
             session.createSQLQuery(sql).executeUpdate();
             transaction.commit();
+        } catch (HibernateException e) {
+            System.err.println(e.getMessage());
         }
     }
 
@@ -53,7 +59,7 @@ public class UserDaoHibernateImpl implements UserDao {
                 User user = new User(name, lastName, age);
                 session.save(user);
                 transaction.commit();
-            } catch (Exception e) {
+            } catch (HibernateException e) {
                 if (transaction != null) {
                     transaction.rollback();
                 }
@@ -73,7 +79,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     session.remove(user);
                 }
                 transaction.commit();
-            } catch (Exception e) {
+            } catch (HibernateException e) {
                 if (transaction != null) {
                     transaction.rollback();
                 }
@@ -92,7 +98,7 @@ public class UserDaoHibernateImpl implements UserDao {
             criteria.select(root);
             users = session.createQuery(criteria).getResultList();
         }
-        return users;
+        return users.isEmpty() ? new ArrayList<>() : users;
     }
 
     @Override
@@ -102,6 +108,8 @@ public class UserDaoHibernateImpl implements UserDao {
             Transaction transaction = session.beginTransaction();
             session.createSQLQuery(sql).executeUpdate();
             transaction.commit();
+        }  catch (HibernateException e) {
+            System.err.println(e.getMessage());
         }
     }
 }

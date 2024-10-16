@@ -16,7 +16,7 @@ public class Util {
     public static final String USERNAME = "root";
     public static final String PASSWORD = "Da!00796da";
     public static final Connection CONNECTION = getConnection();
-    private static SessionFactory session;
+    private static SessionFactory session = getSessionFactory();
 
     private Util() {
     }
@@ -58,6 +58,10 @@ public class Util {
             System.err.println(e.getMessage());
         }
         return session;
+    }
+
+    public static void closeSessionFactory() {
+        session.close();
     }
 
 }
