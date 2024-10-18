@@ -90,15 +90,17 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        List<User> users = null;
+        List<User> users = new ArrayList<>();
         try (Session session = Util.getSessionFactory().openSession()) {
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaQuery<User> criteria = builder.createQuery(User.class);
             Root<User> root = criteria.from(User.class);
             criteria.select(root);
             users = session.createQuery(criteria).getResultList();
+        } catch (HibernateException e) {
+            System.err.println(e.getMessage());
         }
-        return users.isEmpty() ? new ArrayList<>() : users;
+        return users;
     }
 
     @Override
